@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "890890810672",
+    "project_id": "mobile-final-64901",
+    "storage_bucket": "mobile-final-64901.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:890890810672:android:de1151da754a92080d84f5",
+        "android_client_info": {
+          "package_name": "com.ait.oncue"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3Bj1o8WGtv7GyBnCm7CQqvlH82IFdBko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
