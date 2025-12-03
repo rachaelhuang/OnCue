@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 
@@ -225,6 +226,41 @@ class OnCueRepository {
     }
 
     // ------------------------------------------
+    // PROFILE & HISTORY LOGIC
+    // ------------------------------------------
+
+    /**
+     * Fetches the full user profile (streak, username, pfp) from Firestore.
+     */
+    suspend fun getUserProfile(userId: String): Result<OnCueUser?> {
+        return try {
+            val snapshot = db.collection("users").document(userId).get().await()
+            val user = snapshot.toObject(OnCueUser::class.java)
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Fetches all past posts by a specific user (for their Profile Page).
+     */
+    suspend fun getUserHistory(userId: String): Result<List<Post>> {
+        return try {
+            val snapshot = db.collection("posts")
+                .whereEqualTo("userId", userId)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get()
+                .await()
+
+            val posts = snapshot.documents.mapNotNull { it.toObject(Post::class.java) }
+            Result.success(posts)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // ------------------------------------------
     // HELPER LOGIC
     // ------------------------------------------
 
@@ -233,9 +269,39 @@ class OnCueRepository {
 
         db.runTransaction { transaction ->
             val snapshot = transaction.get(userRef)
-            // Logic to check dates and increment 'currentStreak' would go here
-            // For MVP, we just update the lastPostDate
-            transaction.update(userRef, "lastPostDate", Date())
+            val lastDate = snapshot.getDate("lastPostDate")
+            var currentStreak = snapshot.getLong("currentStreak")?.toInt() ?: 0
+
+            val now = Calendar.getInstance()
+            val lastPost = Calendar.getInstance()
+
+            if (lastDate != null) {
+                lastPost.time = lastDate
+
+                // Check if last post was yesterday
+                val yesterday = Calendar.getInstance()
+                yesterday.add(Calendar.DAY_OF_YEAR, -1)
+
+                val isSameDay = now.get(Calendar.YEAR) == lastPost.get(Calendar.YEAR) &&
+                        now.get(Calendar.DAY_OF_YEAR) == lastPost.get(Calendar.DAY_OF_YEAR)
+
+                val isYesterday = yesterday.get(Calendar.YEAR) == lastPost.get(Calendar.YEAR) &&
+                        yesterday.get(Calendar.DAY_OF_YEAR) == lastPost.get(Calendar.DAY_OF_YEAR)
+
+                if (isYesterday) {
+                    currentStreak += 1
+                } else if (!isSameDay) {
+                    // If it wasn't today and wasn't yesterday, streak is broken
+                    currentStreak = 1
+                }
+                // If isSameDay, do nothing (already posted today)
+            } else {
+                // First post ever
+                currentStreak = 1
+            }
+
+            transaction.update(userRef, "currentStreak", currentStreak)
+            transaction.update(userRef, "lastPostDate", now.time)
         }.await()
     }
 }
