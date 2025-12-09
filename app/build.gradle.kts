@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    //id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -49,6 +51,20 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // Firebase Setup
+    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    // --- ADD THESE LINES BELOW ---
+    implementation("com.google.firebase:firebase-auth")      // <--- For FirebaseAuth
+    implementation("com.google.firebase:firebase-firestore") // <--- For FirebaseFirestore
+    implementation("com.google.firebase:firebase-storage")   // <--- For FirebaseStorage
+
+    // This is required for the .await() function in OnCueBackend.kt
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    // -----------------------------
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
