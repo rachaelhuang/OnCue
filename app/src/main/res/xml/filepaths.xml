@@ -2,6 +2,6 @@
 
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
 <external-files-path
-    name="images"
-    path="Pictures" />
+    name="camera_images"
+    path="." />
 </paths>

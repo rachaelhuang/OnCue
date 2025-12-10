@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     //id("com.android.application")
     id("com.google.gms.google-services")
+    alias(libs.plugins.hilt.android)
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -18,6 +20,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -32,6 +37,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -39,30 +45,58 @@ android {
     buildFeatures {
         compose = true
     }
+
+    composeOptions.kotlinCompilerExtensionVersion = "1.5.3"
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
-
+    // ANDROIDX CORE + LIFECYCLE
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
+
+    // Lifecycle ViewModel Compose
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // COMPOSE
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
 
     // Firebase Setup
-    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
-    implementation("com.google.firebase:firebase-analytics")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.messaging)
 
-    // --- ADD THESE LINES BELOW ---
-    implementation("com.google.firebase:firebase-auth")      // <--- For FirebaseAuth
-    implementation("com.google.firebase:firebase-firestore") // <--- For FirebaseFirestore
-    implementation("com.google.firebase:firebase-storage")   // <--- For FirebaseStorage
+    // Coroutines Firebase support (.await)
+    implementation(libs.coroutines.play.services)
 
-    // This is required for the .await() function in OnCueBackend.kt
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    // HILT
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
+
+    // CAMERAX
+    // ───────────────────────────────────────────────────────────────
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+
     // -----------------------------
 
     testImplementation(libs.junit)
@@ -72,4 +106,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
+
 }

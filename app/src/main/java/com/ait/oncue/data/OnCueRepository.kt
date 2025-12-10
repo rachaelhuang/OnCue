@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
@@ -36,12 +37,19 @@ data class DailyPrompt(
     val id: String = "",
     val text: String = "",
     val date: String = "", // Format: "YYYY-MM-DD" to easily find "today's" prompt
-    val type: PromptType = PromptType.FUN
-)
+    val type: String = "WRITTEN" // Stored as string in Firebase
+) {
+    fun getPromptType(): PromptType = try {
+        PromptType.valueOf(type)
+    } catch (e: IllegalArgumentException) {
+        PromptType.WRITTEN // fallback
+    }
+}
 
 enum class PromptType {
-    FUN, // "Take a photo of something purple"
-    DEEP // "What are you grateful for?"
+    WRITTEN, // What's something you'd be famous for?
+    UPLOAD, // Upload a photo you find funny
+    SNAPSHOT // "Take a photo of something purple"
 }
 
 /**
@@ -52,6 +60,7 @@ data class Post(
     val userId: String = "",
     val username: String = "", // Storing username here reduces the need for extra lookups
     val promptId: String = "",
+    val promptType: String="",
     val textContent: String? = null,
     val imageUrl: String? = null,
     val timestamp: Date = Date()
@@ -154,11 +163,21 @@ class OnCueRepository {
             val userDoc = db.collection("users").document(user.uid).get().await()
             val currentUsername = userDoc.getString("username") ?: "Anonymous"
 
+            // 3
+            val promptSnapshot = db.collection("prompts")
+                .document(promptId)
+                .get()
+                .await()
+
+            val promptTypeString = promptSnapshot.getString("type") ?: "WRITTEN"
+
+
             val newPost = Post(
                 id = UUID.randomUUID().toString(),
                 userId = user.uid,
                 username = currentUsername,
                 promptId = promptId,
+                promptType = promptTypeString,
                 textContent = text,
                 imageUrl = downloadUrl,
                 timestamp = Date()
