@@ -11,19 +11,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.Card
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ait.oncue.data.OnCueUser
 import com.ait.oncue.data.Post
+import com.ait.oncue.ui.theme.OnCueBackground
 import com.ait.oncue.ui.theme.OnCueGradient
+import com.ait.oncue.ui.theme.GrayGradient
 import com.ait.oncue.ui.theme.OnCueGradientColors
 import com.ait.oncue.ui.theme.OnCueTextGray
 import java.text.SimpleDateFormat
@@ -40,14 +46,14 @@ fun ProfileScreen(
     var selectedTab by remember { mutableIntStateOf(0) } // 0 = Activity, 1 = Prompts
 
     LaunchedEffect(Unit) {
-        viewModel.loadProfile()
-        viewModel.loadUserHistory()
+        viewModel.loadProfileAndHistory()
     }
 
     Scaffold(
         bottomBar = {
+            Box {
             NavigationBar(
-                containerColor = Color(0xFF1A1A1A),
+                containerColor = OnCueBackground,
                 contentColor = Color.White
             ) {
                 NavigationBarItem(
@@ -64,7 +70,11 @@ fun ProfileScreen(
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-                    label = { Text("Profile") },
+                    label = {
+                        Text(
+                            text = "Profile",
+                            fontWeight = FontWeight.Medium
+                        ) },
                     selected = true,
                     onClick = { },
                     colors = NavigationBarItemDefaults.colors(
@@ -75,13 +85,20 @@ fun ProfileScreen(
                     )
                 )
             }
+            // Divider overlaid at the top edge of the NavigationBar
+            HorizontalDivider(
+                color = Color.White.copy(alpha = 0.1f),
+                thickness = 1.dp,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
+    }
     ) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Color(0xFF1A1A1A))
+                .background(OnCueBackground)
         ) {
             Column(
                 modifier = Modifier
@@ -96,11 +113,18 @@ fun ProfileScreen(
                 ) {
                     Column {
                         Text(
-                            text = "Good to see you, ${user?.username ?: "User"}",
+                            text = buildAnnotatedString {
+                                append("Good to see you,\n")
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(user?.username ?: "User")
+                                }
+                            },
                             color = Color.White,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 24.sp
                         )
+
+
+                        Spacer(modifier = Modifier.height(12.dp)) // Add more space before the date
 
                         Text(
                             text = SimpleDateFormat("EEEE, MMM d", Locale.getDefault()).format(Date()),
@@ -109,7 +133,7 @@ fun ProfileScreen(
                         )
                     }
 
-                    // Profile Picture
+                    // Profile picture
                     Box(
                         modifier = Modifier
                             .size(56.dp)
@@ -149,7 +173,8 @@ fun ProfileScreen(
                         onClick = { selectedTab = 0 },
                         text = {
                             Text(
-                                "Activity",
+                                text = "Activity",
+                                fontWeight = FontWeight.Medium,
                                 color = if (selectedTab == 0) Color.White else OnCueTextGray
                             )
                         }
@@ -160,7 +185,8 @@ fun ProfileScreen(
                         onClick = { selectedTab = 1 },
                         text = {
                             Text(
-                                "Prompts",
+                                text = "Prompts",
+                                fontWeight = FontWeight.Medium,
                                 color = if (selectedTab == 1) Color.White else OnCueTextGray
                             )
                         }
@@ -172,7 +198,10 @@ fun ProfileScreen(
                 // Content
                 when (selectedTab) {
                     0 -> ActivityTab(user = user)
-                    1 -> PromptsTab(posts = posts)
+                    1 -> PromptsTab(
+                        posts = viewModel.displayedPosts,
+                        onFilterChange = { viewModel.setShowPinned(it) }
+                    )
                 }
             }
         }
@@ -182,17 +211,24 @@ fun ProfileScreen(
 @Composable
 fun ActivityTab(user: OnCueUser?) {
     Column {
-        // Streak Cards
+        // Streak cards
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Current Streak
+            // Current streak
             Card(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .background(GrayGradient, shape = RoundedCornerShape(16.dp))
+                    .border(
+                        width = 1.dp,
+                        color = Color.White.copy(alpha = 0.075f), // faint white
+                        shape = RoundedCornerShape(16.dp)
+                    ),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF2A2A2A)
+                    containerColor = Color.Transparent
                 )
             ) {
                 Column(
@@ -220,12 +256,19 @@ fun ActivityTab(user: OnCueUser?) {
                 }
             }
 
-            // Best Streak
+            // Best streak
             Card(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .background(GrayGradient, shape = RoundedCornerShape(16.dp))
+                    .border(
+                        width = 1.dp,
+                        color = Color.White.copy(alpha = 0.075f), // faint white
+                        shape = RoundedCornerShape(16.dp)
+                    ),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF2A2A2A)
+                    containerColor = Color.Transparent
                 )
             ) {
                 Column(
@@ -286,10 +329,17 @@ fun ActivityTab(user: OnCueUser?) {
 @Composable
 fun CalendarView() {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(GrayGradient, shape = RoundedCornerShape(16.dp))
+            .border(
+                width = 1.dp,
+                color = Color.White.copy(alpha = 0.075f), // faint white
+                shape = RoundedCornerShape(16.dp)
+            ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2A2A2A)
+            containerColor = Color.Transparent
         )
     ) {
         Column(
@@ -364,7 +414,10 @@ fun CalendarView() {
 }
 
 @Composable
-fun PromptsTab(posts: List<Post>) {
+fun PromptsTab(
+    posts: List<Post>,
+    onFilterChange: (showPinned: Boolean) -> Unit
+) {
     var showPinned by remember { mutableStateOf(true) }
 
     Column {
@@ -375,8 +428,15 @@ fun PromptsTab(posts: List<Post>) {
         ) {
             FilterChip(
                 selected = showPinned,
-                onClick = { showPinned = true },
-                label = { Text("🏅 Pinned") },
+                onClick = {
+                    showPinned = true
+                    onFilterChange(true)
+                },
+                label = {
+                    Text(
+                        text = "Pinned",
+                        fontWeight = FontWeight.Medium
+                    ) },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Color(0xFF3A3A3A),
                     selectedLabelColor = Color.White,
@@ -387,8 +447,15 @@ fun PromptsTab(posts: List<Post>) {
 
             FilterChip(
                 selected = !showPinned,
-                onClick = { showPinned = false },
-                label = { Text("All responses") },
+                onClick = {
+                    showPinned = false
+                    onFilterChange(false)
+                },
+                label = {
+                    Text(
+                        text = "All responses",
+                        fontWeight = FontWeight.Medium
+                    ) },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Color(0xFF3A3A3A),
                     selectedLabelColor = Color.White,
@@ -400,7 +467,7 @@ fun PromptsTab(posts: List<Post>) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Posts Grid
+        // Posts grid
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -418,10 +485,16 @@ fun PromptHistoryCard(post: Post) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .background(GrayGradient, shape = RoundedCornerShape(16.dp))
+            .border(
+                width = 1.dp,
+                color = Color.White.copy(alpha = 0.075f), // faint white
+                shape = RoundedCornerShape(16.dp)
+            )
             .aspectRatio(1f),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF3A3A3A)
+            containerColor = Color.Transparent
         )
     ) {
         Box(modifier = Modifier.fillMaxSize()) {

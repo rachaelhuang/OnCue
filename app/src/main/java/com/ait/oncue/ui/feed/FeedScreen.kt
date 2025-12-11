@@ -14,12 +14,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.ait.oncue.data.OnCueRepository
 import com.ait.oncue.data.Post
+import com.ait.oncue.ui.components.OnCueBottomNavigationBar
+import com.ait.oncue.ui.theme.OnCueBackground
+import com.ait.oncue.ui.theme.OnCueDarkGrayVariant
+import com.ait.oncue.ui.theme.OnCueGradientColors
 import com.ait.oncue.ui.theme.OnCueTextGray
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,11 +34,11 @@ import java.util.*
 @Composable
 fun FeedScreen(
     promptId: String,
-    viewModel: FeedViewModel = hiltViewModel(),
+    viewModel: FeedViewModel,
     onNavigateToProfile: () -> Unit
 ) {
-    LaunchedEffect(promptId) {
-        viewModel.loadFeed(promptId)
+    LaunchedEffect(Unit) {
+        viewModel.loadFeed()
     }
 
     val feedState = viewModel.feedState
@@ -65,12 +71,12 @@ fun FeedScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1A1A1A)
+                    containerColor = OnCueBackground
                 )
             )
         },
         bottomBar = {
-            BottomNavigationBar(
+            OnCueBottomNavigationBar(
                 selectedTab = 0,
                 onHomeClick = { },
                 onProfileClick = onNavigateToProfile
@@ -81,7 +87,7 @@ fun FeedScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Color(0xFF1A1A1A))
+                .background(OnCueBackground)
         ) {
             when (feedState) {
                 is OnCueRepository.FeedState.Locked -> {
@@ -150,7 +156,7 @@ fun PostCard(post: Post) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2A2A2A)
+            containerColor = OnCueDarkGrayVariant
         )
     ) {
         Column(
@@ -206,7 +212,7 @@ fun PostCard(post: Post) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Prompt badge
+            // Prompt badge - show the actual type from the post!
             Text(
                 text = when (post.promptType) {
                     "WRITTEN" -> "✨ WRITTEN PROMPT"
@@ -234,13 +240,14 @@ fun PostCard(post: Post) {
             // Image if exists
             post.imageUrl?.let { url ->
                 Spacer(modifier = Modifier.height(12.dp))
-                // TODO: Load image with Coil
-                Box(
+                AsyncImage(
+                    model = url,
+                    contentDescription = "Post image",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFF3A3A3A))
+                        .height(250.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
                 )
             }
 
@@ -303,6 +310,7 @@ fun ErrorState(message: String) {
         )
     }
 }
+
 
 private fun formatTimestamp(date: Date): String {
     val now = Date()

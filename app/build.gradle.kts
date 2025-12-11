@@ -90,6 +90,9 @@ dependencies {
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
+    // Coil
+    implementation(libs.coil.compose)
+
     // CAMERAX
     // ───────────────────────────────────────────────────────────────
     implementation(libs.camerax.core)

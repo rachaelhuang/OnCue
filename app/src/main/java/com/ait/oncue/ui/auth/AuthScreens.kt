@@ -39,7 +39,7 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1A1A1A))
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp)
     ) {
         Column(
@@ -66,11 +66,11 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(64.dp))
 
-            // Email Field
+            // Email field
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email", color = OnCueTextGray) },
+                label = { Text("Email", color = OnCueTextGray, fontSize = 14.sp) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
@@ -91,7 +91,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password", color = OnCueTextGray) },
+                label = { Text("Password", color = OnCueTextGray, fontSize = 14.sp) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
@@ -124,6 +124,7 @@ fun LoginScreen(
                 onClick = { viewModel.signIn(email, password) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(),
                 enabled = email.isNotBlank() && password.isNotBlank() && !viewModel.loading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
@@ -152,8 +153,7 @@ fun LoginScreen(
                         Text(
                             text = "Log In",
                             color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
@@ -176,8 +176,7 @@ fun LoginScreen(
                     Text(
                         text = "Sign Up",
                         color = OnCueGradientColors.first(),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
@@ -205,7 +204,7 @@ fun SignUpScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1A1A1A))
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp)
     ) {
         Column(
@@ -232,11 +231,11 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Username Field
+            // Username field
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text("Username", color = OnCueTextGray) },
+                label = { Text("Username", color = OnCueTextGray, fontSize = 14.sp) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
@@ -252,11 +251,17 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Email Field
+            // Email field
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email", color = OnCueTextGray) },
+                label = {
+                    Text(
+                        text ="Email",
+                        color = OnCueTextGray,
+                        fontSize = 14.sp,
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
@@ -273,11 +278,17 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Password Field
+            // Password field
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password", color = OnCueTextGray) },
+                label = {
+                    Text(
+                        text = "Password",
+                        color = OnCueTextGray,
+                        fontSize = 14.sp,
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
@@ -299,7 +310,7 @@ fun SignUpScreen(
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                label = { Text("Confirm Password", color = OnCueTextGray) },
+                label = { Text("Confirm Password", color = OnCueTextGray, fontSize = 14.sp) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
@@ -342,6 +353,7 @@ fun SignUpScreen(
                 onClick = { viewModel.signUp(email, password, username) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(),
                 enabled = username.isNotBlank() && email.isNotBlank() &&
                         password.isNotBlank() && password == confirmPassword &&
                         !viewModel.loading,
@@ -373,7 +385,7 @@ fun SignUpScreen(
                             text = "Sign Up",
                             color = Color.White,
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -392,12 +404,14 @@ fun SignUpScreen(
                     fontSize = 14.sp
                 )
 
-                TextButton(onClick = onNavigateToLogin) {
+                TextButton(
+                    onClick = onNavigateToLogin,
+                    ) {
                     Text(
                         text = "Log In",
                         color = OnCueGradientColors.first(),
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }

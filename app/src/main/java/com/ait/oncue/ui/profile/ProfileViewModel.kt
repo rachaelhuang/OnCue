@@ -22,29 +22,45 @@ class ProfileViewModel @Inject constructor(
     var loading by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
 
-    fun loadProfile() = viewModelScope.launch {
-        loading = true
-        val currentUser = repo.getCurrentUser()
+    var showPinnedOnly by mutableStateOf(true)
+        private set
 
-        if (currentUser != null) {
+    // Filtered posts for the PromptsTab
+    val displayedPosts: List<Post>
+        get() = if (showPinnedOnly) userPosts.filter { it.id.hashCode() % 2 == 0 } // example pinned logic
+        else userPosts
+
+    fun setShowPinned(value: Boolean) {
+        showPinnedOnly = value
+    }
+
+    fun loadProfileAndHistory() {
+        viewModelScope.launch {
+            loading = true
+            error = null
+
+            val currentUser = repo.getCurrentUser()
+            if (currentUser == null) {
+                error = "Not logged in"
+                loading = false
+                return@launch
+            }
+
+            // Load profile
             repo.getUserProfile(currentUser.uid).onSuccess {
                 user = it
             }.onFailure {
                 error = it.message
             }
-        }
-        loading = false
-    }
 
-    fun loadUserHistory() = viewModelScope.launch {
-        val currentUser = repo.getCurrentUser()
-
-        if (currentUser != null) {
+            // Load history
             repo.getUserHistory(currentUser.uid).onSuccess {
                 userPosts = it
             }.onFailure {
                 error = it.message
             }
+
+            loading = false
         }
     }
 }

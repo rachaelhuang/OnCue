@@ -13,14 +13,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ait.oncue.data.OnCueRepository
 import com.ait.oncue.ui.auth.LoginScreen
 import com.ait.oncue.ui.auth.SignUpScreen
 import com.ait.oncue.ui.feed.FeedScreen
+import com.ait.oncue.ui.feed.FeedViewModel
 import com.ait.oncue.ui.feed.PromptScreen
 import com.ait.oncue.ui.feed.SubmitScreen
+import com.ait.oncue.ui.feed.TakePhotoScreen
+import com.ait.oncue.ui.feed.UploadImageScreen
 import com.ait.oncue.ui.profile.ProfileScreen
 import com.ait.oncue.ui.theme.OnCueTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,11 +83,63 @@ fun OnCueApp() {
         // Main App
         composable("prompt") {
             PromptScreen(
-                onNavigateToSubmit = { promptId ->
-                    navController.navigate("submit/$promptId")
+                onNavigateToSubmit = { promptId, type ->
+                    when (type) {
+                        "WRITTEN" -> navController.navigate("submitWritten/$promptId")
+                        "UPLOAD" -> navController.navigate("submitUpload/$promptId")
+                        "SNAPSHOT" -> navController.navigate("submitSnapshot/$promptId")
+                    }
                 },
                 onNavigateToProfile = {
                     navController.navigate("profile")
+                }
+            )
+        }
+
+        // Written prompt
+        composable("submitWritten/{promptId}") { backStackEntry ->
+            val promptId = backStackEntry.arguments?.getString("promptId") ?: ""
+            SubmitScreen(
+                promptId = promptId,
+                onNavigateToFeed = {
+                    navController.navigate("feed/$promptId") {
+                        popUpTo("prompt") { inclusive = false }
+                    }
+                },
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // Upload prompt — opens gallery
+        composable("submitUpload/{promptId}") { backStackEntry ->
+            val promptId = backStackEntry.arguments?.getString("promptId") ?: ""
+            val promptType = backStackEntry.arguments?.getString("promptType") ?: ""
+
+            UploadImageScreen(
+                promptId = promptId,
+                promptType = promptType,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToFeed = {
+                    navController.navigate("feed/$promptId") {
+                        popUpTo("prompt") { inclusive = false }
+                    }
+                }
+            )
+        }
+
+        // Snapshot prompt — opens camera
+        composable("submitSnapshot/{promptId}") { backStackEntry ->
+            val promptId = backStackEntry.arguments?.getString("promptId") ?: ""
+            val promptType = backStackEntry.arguments?.getString("promptType") ?: ""
+
+            TakePhotoScreen(
+                promptId = promptId,
+                promptType = promptType,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToFeed = {
+                    navController.navigate("feed/$promptId") {
+                        popUpTo("prompt") { inclusive = false }
+                    }
                 }
             )
         }
@@ -100,10 +157,13 @@ fun OnCueApp() {
             )
         }
 
+        // Feed screen
         composable("feed/{promptId}") { backStackEntry ->
             val promptId = backStackEntry.arguments?.getString("promptId") ?: ""
+            val viewModel = hiltViewModel<FeedViewModel>()
             FeedScreen(
                 promptId = promptId,
+                viewModel = viewModel,
                 onNavigateToProfile = { navController.navigate("profile") }
             )
         }

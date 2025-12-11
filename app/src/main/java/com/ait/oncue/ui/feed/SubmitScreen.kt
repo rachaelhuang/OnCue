@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ait.oncue.SubmitViewModel
+import com.ait.oncue.ui.theme.OnCueDarkGold
 import com.ait.oncue.ui.theme.OnCueGradient
 import com.ait.oncue.ui.theme.OnCueGradientColors
 import com.ait.oncue.ui.theme.OnCueTextGray
@@ -66,7 +67,7 @@ fun SubmitScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Color(0xFF1A1A1A))
+                .background(MaterialTheme.colorScheme.background)
         ) {
             if (viewModel.loading) {
                 LoadingState()
@@ -90,8 +91,8 @@ fun SubmitScreen(
 
                     // Badge
                     Text(
-                        text = "CREATIVE PROMPT",
-                        color = OnCueTextGray,
+                        text = "${prompt?.type ?: "WRITTEN"} PROMPT",
+                        color = OnCueDarkGold,
                         fontSize = 12.sp,
                         letterSpacing = 1.sp
                     )
@@ -165,6 +166,7 @@ fun SubmitScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         enabled = textInput.isNotBlank(),
+                        contentPadding = PaddingValues(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
                             disabledContainerColor = Color.Transparent
@@ -194,7 +196,7 @@ fun SubmitScreen(
                                 color = if (textInput.isNotBlank()) Color.White
                                 else OnCueTextGray,
                                 fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.Medium
                             )
                         }
                     }

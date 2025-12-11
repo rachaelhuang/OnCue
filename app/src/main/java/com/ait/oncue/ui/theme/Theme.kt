@@ -31,6 +31,7 @@ val AppTypography = _root_ide_package_.androidx.compose.material3.Typography(
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp
     ),
+
     bodyLarge = TextStyle(
         fontFamily = InstrumentSans,
         fontWeight = FontWeight.Normal,
@@ -42,11 +43,21 @@ val AppTypography = _root_ide_package_.androidx.compose.material3.Typography(
         fontSize = 24.sp
     ),
 )
+
+val OnCueBackground = Color(0xFF09090B) // hex #09090B
+val OnCueDarkGold = Color(0xFFC9A86A)
+
 // OnCue brand colors - orange to pink gradient
 val OnCueOrange = Color(0xFFFF7A3D)
 val OnCuePink = Color(0xFFFF4B91)
 val OnCueDarkGray = Color(0xFF1A1A1A)
 val OnCueMediumGray = Color(0xFF2A2A2A)
+
+val OnCueMediumDarkGray = Color(0xFF202020)
+
+val OnCueAlmostBlack = Color(0xFF0F0F12)
+val OnCueDarkGrayVariant = Color(0xFF18181B)
+
 val OnCueLightGray = Color(0xFF3A3A3A)
 val OnCueTextGray = Color(0xFF9E9E9E)
 
@@ -57,8 +68,17 @@ val OnCueGradient = Brush.horizontalGradient(
     colors = listOf(OnCueOrange, OnCuePink)
 )
 
+val GrayGradient = Brush.horizontalGradient(
+    colors = listOf(OnCueDarkGrayVariant, OnCueAlmostBlack)
+)
+
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
+    onPrimary = Color.Black,
+    background = OnCueBackground,
+    onBackground = Color.White,
+    surface = Color(0xFF0D0D0D),
+    onSurface = Color.White,
     secondary = PurpleGrey80,
     tertiary = Pink80
 )
