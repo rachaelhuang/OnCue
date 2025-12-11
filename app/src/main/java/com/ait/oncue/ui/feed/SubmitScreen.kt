@@ -192,7 +192,7 @@ fun SubmitScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Submit 🚀",
+                                text = "Submit",
                                 color = if (textInput.isNotBlank()) Color.White
                                 else OnCueTextGray,
                                 fontSize = 16.sp,

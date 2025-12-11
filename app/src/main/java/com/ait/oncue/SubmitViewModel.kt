@@ -25,7 +25,7 @@ class SubmitViewModel @Inject constructor(
         Log.d("SubmitViewModel", "Submitting with promptId: $promptId, type: $promptType")
         viewModelScope.launch {
             loading = true
-            val result = repo.submitPost(promptId, text, uri)
+            val result = repo.submitPost(promptId, promptType,text, uri)
             loading = false
             success = result.isSuccess
             error = result.exceptionOrNull()?.message

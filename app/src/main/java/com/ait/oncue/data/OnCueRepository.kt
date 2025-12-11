@@ -127,6 +127,7 @@ class OnCueRepository {
 
     suspend fun submitPost(
         promptId: String,
+        promptType: String,
         text: String?,
         imageUri: Uri?
     ): Result<Boolean> {

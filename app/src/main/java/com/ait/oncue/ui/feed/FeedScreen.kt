@@ -227,6 +227,16 @@ fun PostCard(post: Post) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Prompt itself
+            Text (
+                text = post.promptText,
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             // Post content
             post.textContent?.let { content ->
                 Text(

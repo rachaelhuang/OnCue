@@ -383,6 +383,7 @@ fun TakePhotoScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(),
                         enabled = !viewModel.loading,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent
@@ -402,7 +403,7 @@ fun TakePhotoScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "Submit 🚀",
+                                    text = "Submit",
                                     color = Color.White,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold
